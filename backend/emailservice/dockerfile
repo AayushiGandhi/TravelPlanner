@@ -1,0 +1,23 @@
+# Use OpenJDK base image
+FROM openjdk:17-jdk-slim
+
+# Set working directory
+WORKDIR /app
+
+# Create the app directory
+RUN mkdir -p /app
+
+# Copy JAR file (Replace 'email-service.jar' with your actual JAR file name)
+COPY target/emailservice-0.0.1-SNAPSHOT.jar app.jar
+
+# Expose the necessary port
+EXPOSE 8081
+
+# Set environment variables
+ENV SPRING_DATASOURCE_URL=jdbc:postgresql://email:5432/emaildb
+ENV SPRING_DATASOURCE_USERNAME=admin
+ENV SPRING_DATASOURCE_PASSWORD=admin
+ENV SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+
+# Run the application
+CMD ["java", "-jar", "app.jar"]
