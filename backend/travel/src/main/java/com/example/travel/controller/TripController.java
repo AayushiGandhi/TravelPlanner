@@ -1,16 +1,22 @@
 package com.example.travel.controller;
 
+import com.example.travel.dto.TripInput;
 import com.example.travel.kafka.TravelProducer;
 import com.example.travel.model.TripModel;
 import com.example.travel.dto.Trip;
 import com.example.travel.service.TripService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/trips")
+//@RestController
+//@RequestMapping("/api/trips")
+@Controller
 public class TripController {
     @Autowired
     private TripService tripService;
@@ -21,32 +27,45 @@ public class TripController {
         this.travelProducer = travelProducer;
     }
 
-    @GetMapping
+    //@GetMapping
+    @QueryMapping("allTrips")
     public List<TripModel> getAllTrips() {
         return tripService.getAllTrips();
     }
 
-    @GetMapping("/{id}")
-    public TripModel getTripById(@PathVariable Long id) {
+    //@GetMapping("/{id}")
+    @QueryMapping("getTrip")
+    public TripModel getTripById(@Argument Long id) {
         return tripService.getTripById(id);
     }
+//    public TripModel getTripById(@PathVariable Long id) {
+//        return tripService.getTripById(id);
+//    }
 
-    @PostMapping
-    public TripModel createTrip(@RequestBody TripModel tripModel) {
+    //@PostMapping
+    @MutationMapping("createTrip")
+    public TripModel createTrip(@Argument TripInput trip) {
+//    public TripModel createTrip(@RequestBody TripModel tripModel) {
 
-        Trip trip = new Trip();
-        trip.setId(tripModel.getId());
-        trip.setDestination(tripModel.getDestination());
-        trip.setStartDate(tripModel.getStartDate());
-        trip.setEndDate(tripModel.getEndDate());
-        trip.setDescription(tripModel.getDescription());
+        Trip tripdto = new Trip();
+        //tripdto.setId(trip.getId());
+        tripdto.setDestination(trip.getDestination());
+        tripdto.setStartDate(trip.getStartDate());
+        tripdto.setEndDate(trip.getEndDate());
+        tripdto.setDescription(trip.getDescription());
 
-        travelProducer.sendMessage(trip);
+        travelProducer.sendMessage(tripdto);
+
+        TripModel tripModel = new TripModel();
+        tripModel.setDestination(trip.getDestination());
+        tripModel.setStartDate(trip.getStartDate());
+        tripModel.setEndDate(trip.getEndDate());
+        tripModel.setDescription(trip.getDescription());
 
         return tripService.saveTrip(tripModel);
     }
 
-    @DeleteMapping("/{id}")
+    //@DeleteMapping("/{id}")
     public void deleteTrip(@PathVariable Long id) {
         tripService.deleteTrip(id);
     }

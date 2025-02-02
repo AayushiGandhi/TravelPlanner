@@ -1,0 +1,23 @@
+type Mutation {
+    createTrip(trip: TripInput): Trip
+}
+
+type Query {
+    allTrips: [Trip]
+    getTrip(id:ID): Trip
+}
+
+type Trip {
+    id: ID!,
+    destination: String,
+    startDate: String,
+    endDate: String,
+    description: String,
+}
+
+input TripInput {
+    destination: String!
+    startDate: String!
+    endDate: String!
+    description: String!
+}
